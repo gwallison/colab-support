@@ -15,7 +15,7 @@ import zipfile
 import requests
 from io import BytesIO
 
-def get_dataset(url = zip_url,verbose=True): 
+def get_dataset(url = zip_url,remove_duplicates=True,verbose=True): 
 
     # get zipped file with CSV table from given address
     c = requests.get(url).content
@@ -26,10 +26,10 @@ def get_dataset(url = zip_url,verbose=True):
         print(f' Files in downloaded zip archive: {zfile.namelist()}')
     
     # now unzip and create the associated dataframes
-    with zfile.open('repo_info.txt','r') as f:
-        txt = f.read()
     if verbose:
-        print(f' reading data from repository: {txt}')
+        with zfile.open('repo_info.txt','r') as f:
+            txt = f.read()
+            print(f' reading data from repository: {txt}')
     
     with zfile.open('disclosures.csv') as f:
         if verbose: print(' -- processing disclosures')
@@ -46,5 +46,8 @@ def get_dataset(url = zip_url,verbose=True):
         casdf = pd.read_csv(f,quotechar='$',
                           encoding='utf-8',low_memory=False)
     mg = pd.merge(mg,casdf, on='bgCAS', how='left')
+    if remove_duplicates: 
+        if verbose: print(' -- removing duplicates')
+        mg = mg[~mg.is_duplicate]
     if verbose: print(f'Dataframe size: {mg.shape}')
     return mg
