@@ -9,20 +9,23 @@ Used to make
 import pandas as pd
 from IPython.display import display
 # from IPython.display import Markdown as md
-from google.colab import data_table
-data_table.enable_dataframe_formatter()
+# from google.colab import data_table
+# data_table.enable_dataframe_formatter()
 
-def summarize_api_set(lst,df):
-    upk = df[df.api10.isin(lst)].UploadKey.unique().tolist()
+
+def disclosure_summary_meta(apilst,df):
+    
+    upk = df[df.api10.isin(apilst)].UploadKey.unique().tolist()
     print(f'Number of disclosures within range: {len(upk)} ')
     gb = df[df.UploadKey.isin(upk)].groupby('UploadKey',as_index=False)[['APINumber',
                                                                          'WellName',
                                                                          'date',
                                                                          'OperatorName',
                                                                          'TotalBaseWaterVolume',]].first()
-    data_table.DataTable(gb, include_index=False, num_rows_per_page=25)
+    display(gb)
 
-    # print(df.columns)
+def disclosure_summary_chem(apilst,df):
+    upk = df[df.api10.isin(apilst)].UploadKey.unique().tolist()
     df['year'] = df.date.dt.year
     t = df[df.UploadKey.isin(upk)]
     mg = pd.merge(t.groupby('bgCAS',as_index=False)['calcMass'].sum(),
