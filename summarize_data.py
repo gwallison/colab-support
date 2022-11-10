@@ -22,7 +22,7 @@ def disclosure_summary_meta(apilst,df):
                                                                          'date',
                                                                          'OperatorName',
                                                                          'TotalBaseWaterVolume',]].first()
-    display(gb)
+    return gb
 
 def disclosure_summary_chem(apilst,df):
     upk = df[df.api10.isin(apilst)].UploadKey.unique().tolist()
@@ -35,4 +35,4 @@ def disclosure_summary_chem(apilst,df):
                   t.groupby('bgCAS',as_index=False)['year'].max().rename({'year':'max_year'},axis=1),
                   on='bgCAS',how='inner')
     
-    display(pd.merge(mg,mg1,on='bgCAS',how='inner'))
+    return pd.merge(mg,mg1,on='bgCAS',how='inner')
